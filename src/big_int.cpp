@@ -90,7 +90,7 @@ big_int& big_int::operator=(big_int&& bi) noexcept
     return *this;
 }
 
-bool big_int::operator==(const big_int& bi)
+bool big_int::operator==(const big_int& bi)const
 {
     if(sign != bi.sign or num.size() != bi.num.size())
     {
@@ -107,9 +107,35 @@ bool big_int::operator==(const big_int& bi)
     return true;
 }
 
+bool big_int::operator<(const big_int& right_val) const
+{
+    return less_than_greater_than(right_val, LESS_THAN, DIFFERENT);
+}
+
+bool big_int::operator<=(const big_int& right_val) const 
+{
+    return less_than_greater_than(right_val, LESS_THAN, EQUAL);
+}
+
+bool big_int::operator>(const big_int& right_val) const
+{
+    return less_than_greater_than(right_val, GREATER_THAN, DIFFERENT);
+}
+
+bool big_int::operator>=(const big_int& right_val) const 
+{
+    return less_than_greater_than(right_val, GREATER_THAN, EQUAL);
+}
+
 big_int big_int::operator+(const big_int& right_val) const
 {
     return plus(right_val);
+}
+
+big_int& big_int::operator+=(const big_int& right_val)
+{
+    *this = *this + right_val;
+    return *this;
 }
 
 // For now only implementing positive integers
@@ -151,6 +177,44 @@ big_int big_int::plus(const big_int& right_val) const
     std::reverse(sum_vect.begin(), sum_vect.end());
     big_int myInt(std::move(sum_vect));
     return myInt;
+}
+
+bool big_int::less_than_greater_than(const big_int& right_val, const bool& option, const bool& equals) const
+{
+    if (sign != right_val.sign)
+    {
+        if (sign == NEGATIVE)
+        {
+            return !(false ^ option);
+        }
+        else
+        {
+            return !(true ^ option);
+        }
+    }
+    else if (num.size() < right_val.num.size())
+    {
+        return !(false ^ option);
+    }
+    else if (num.size() > right_val.num.size())
+    {
+        return !(true ^ option);
+    }
+    else //both values are same size and same sign
+    {
+        for (size_t i(0); i < num.size(); ++i)
+        {
+            if (num[i] > right_val.num[i])
+            {
+               return !(true ^ option);
+            }
+            else if (num[i] < right_val.num[i])
+            {
+                return !(false ^ option);
+            }
+        }
+    }
+    return equals; 
 }
 
 //TODO
